@@ -5,6 +5,7 @@
               xmlns:tools="http://schemas.android.com/tools">
 
     <android.support.v7.widget.RecyclerView
+            android:background="@color/colorPrimary"
             android:id="@+id/rv_movies"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
