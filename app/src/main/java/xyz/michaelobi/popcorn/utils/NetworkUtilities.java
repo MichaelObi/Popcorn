@@ -16,8 +16,7 @@ import xyz.michaelobi.popcorn.BuildConfig;
 
 public class NetworkUtilities {
 
-    final static String PARAM_QUERY = "q";
-    private final static String PARAM_API_KEY = "api_key";
+    private final static String PARAM_API_KEY = "?api_key=";
     private static final String BASE_API_URL =
             "https://api.themoviedb.org/3/movie/";
     private static final String BASE_IMAGE_URL =
@@ -48,8 +47,7 @@ public class NetworkUtilities {
      * @return The URL to use to query the server.
      */
     public static URL buildUrl(String sortBy) {
-        Uri uri = Uri.parse(BASE_API_URL + sortBy).buildUpon()
-                .appendQueryParameter(PARAM_API_KEY, BuildConfig.TMDB_API_KEY)
+        Uri uri = Uri.parse(BASE_API_URL + sortBy + PARAM_API_KEY + BuildConfig.TMDB_API_KEY).buildUpon()
                 .build();
         URL url = null;
         try {

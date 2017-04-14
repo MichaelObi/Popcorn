@@ -51,13 +51,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        checkNetworkAvailability();
-        progressBar = (ProgressBar) findViewById(R.id.progressbar_loading);
         recyclerViewMovies = (RecyclerView) findViewById(R.id.rv_movies);
+        recyclerViewMovies.setHasFixedSize(false);
+        recyclerViewMovies.setLayoutManager(new GridLayoutManager(this, calculateNoOfColumns()));
         movieListAdapter = new MovieListAdapter(this);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, calculateNoOfColumns());
-        recyclerViewMovies.setLayoutManager(layoutManager);
         recyclerViewMovies.setAdapter(movieListAdapter);
+
+        progressBar = (ProgressBar) findViewById(R.id.progressbar_loading);
 
         new MovieListTask().execute();
     }
@@ -124,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            checkNetworkAvailability();
             progressBar.setVisibility(View.VISIBLE);
             recyclerViewMovies.setVisibility(View.GONE);
             if (getSupportActionBar() != null) {
@@ -141,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             List<Movie> movies = new ArrayList<>();
-
             try {
                 JSONObject jsonObject = new JSONObject(response);
                 JSONArray jsonArray = jsonObject.getJSONArray("results");

@@ -13,7 +13,6 @@
             android:numColumns="auto_fit"
             android:scrollbars="vertical"
             android:verticalSpacing="4dp"
-            android:visibility="gone"
             tools:listitem="@layout/movie_grid_item"/>
     <ProgressBar
             android:visibility="visible"

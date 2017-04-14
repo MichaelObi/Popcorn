@@ -24,17 +24,20 @@ import xyz.michaelobi.popcorn.movieDetails.DetailsActivity;
  */
 
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.ViewHolder> {
-    private Context context;
+    private final Context context;
     private List<Movie> movieList = new ArrayList<>();
 
     public MovieListAdapter(Context context) {
         this.context = context;
     }
 
-    public void setMovieList(List<Movie> movieList) {
-        this.movieList.clear();
-        this.movieList.addAll(movieList);
-        notifyDataSetChanged();
+    public void setMovieList(List<Movie> movies) {
+
+        if (movieList == movies) {
+            return;
+        }
+        movieList = movies;
+        this.notifyDataSetChanged();
     }
 
     @Override
@@ -61,6 +64,9 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
     @Override
     public int getItemCount() {
+        if (movieList == null) {
+            return 0;
+        }
         return movieList.size();
     }
 
