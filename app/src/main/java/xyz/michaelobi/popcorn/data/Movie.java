@@ -1,5 +1,8 @@
 package xyz.michaelobi.popcorn.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 
 /**
@@ -8,7 +11,7 @@ import java.io.Serializable;
  * 11 04 2017 12:44 AM
  */
 
-public class Movie implements Serializable {
+public class Movie implements Parcelable {
     private String posterUrl;
     private String overview;
     private String title;
@@ -63,4 +66,43 @@ public class Movie implements Serializable {
     public String getReleaseYear() {
         return releaseYear;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.posterUrl);
+        dest.writeString(this.overview);
+        dest.writeString(this.title);
+        dest.writeString(this.backdropUrl);
+        dest.writeDouble(this.rating);
+        dest.writeString(this.releaseYear);
+    }
+
+    public Movie() {
+    }
+
+    protected Movie(Parcel in) {
+        this.posterUrl = in.readString();
+        this.overview = in.readString();
+        this.title = in.readString();
+        this.backdropUrl = in.readString();
+        this.rating = in.readDouble();
+        this.releaseYear = in.readString();
+    }
+
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }

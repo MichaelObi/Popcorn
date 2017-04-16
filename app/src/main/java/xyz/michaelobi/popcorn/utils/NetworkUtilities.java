@@ -21,8 +21,10 @@ public class NetworkUtilities {
             "https://api.themoviedb.org/3/movie/";
     private static final String BASE_IMAGE_URL =
             "http://image.tmdb.org/t/p/";
-    private static final String DEFAULT_IMAGE_SIZE =
+    public static final String DEFAULT_IMAGE_SIZE =
             "w185";
+
+    public static final String LARGE_IMAGE_SIZE  = "w342";
 
     public static Boolean isNetworkEnabled(Context c) {
         ConnectivityManager cManager = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -67,6 +69,8 @@ public class NetworkUtilities {
      */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setConnectTimeout(30000);
+        urlConnection.setUseCaches(false);
         try {
             InputStream in = urlConnection.getInputStream();
 
@@ -84,7 +88,11 @@ public class NetworkUtilities {
         }
     }
 
-    public static String buildImageUrl(String posterUrl) {
-        return BASE_IMAGE_URL + DEFAULT_IMAGE_SIZE + posterUrl;
+    public static String buildImageUrl(String fileName) {
+        return buildImageUrl(fileName, DEFAULT_IMAGE_SIZE);
+    }
+
+    public static String  buildImageUrl(String fileName, String size) {
+        return BASE_IMAGE_URL + size + fileName;
     }
 }

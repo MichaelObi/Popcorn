@@ -33,7 +33,7 @@ public class DetailsActivity extends AppCompatActivity{
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        movie = (Movie) getIntent().getSerializableExtra("movie");
+        movie = getIntent().getParcelableExtra("movie");
         if (movie == null) {
             finish();
         }

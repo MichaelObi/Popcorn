@@ -6,4 +6,6 @@
     <string name="poster">Poster</string>
     <string name="title">Logan</string>
     <string name="sort">Sort</string>
+    <string name="retry">Retry</string>
+    <string name="internet_connection_error">Unable to establish internet connection</string>
 </resources>

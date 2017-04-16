@@ -1,6 +1,7 @@
 package xyz.michaelobi.popcorn.movieList;
 
 import android.content.DialogInterface;
+import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,8 +15,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +30,7 @@ import java.util.List;
 
 import xyz.michaelobi.popcorn.R;
 import xyz.michaelobi.popcorn.data.Movie;
+import xyz.michaelobi.popcorn.databinding.MainBinding;
 import xyz.michaelobi.popcorn.utils.NetworkUtilities;
 
 /**
@@ -42,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
     private final String sortTypePopular = "popular";
     private final String sortTypeTopRated = "top_rated";
     AlertDialog alertDialog;
+    View errorView;
+    TextView error;
+    Button retryButton;
     private ProgressBar progressBar;
     private RecyclerView recyclerViewMovies;
     private MovieListAdapter movieListAdapter;
@@ -50,14 +56,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        recyclerViewMovies = (RecyclerView) findViewById(R.id.rv_movies);
+        MainBinding binding = DataBindingUtil.setContentView(this, R.layout.main);
+        errorView = binding.errorLayout;
+        error = binding.error;
+
+        retryButton = binding.btnRetry;
+        progressBar = binding.progressbarLoading;
+        recyclerViewMovies = binding.rvMovies;
         recyclerViewMovies.setHasFixedSize(false);
         recyclerViewMovies.setLayoutManager(new GridLayoutManager(this, calculateNoOfColumns()));
         movieListAdapter = new MovieListAdapter(this);
         recyclerViewMovies.setAdapter(movieListAdapter);
-
-        progressBar = (ProgressBar) findViewById(R.id.progressbar_loading);
 
         new MovieListTask().execute();
     }
@@ -68,15 +77,17 @@ public class MainActivity extends AppCompatActivity {
         return (int) (dpWidth / 180);
     }
 
-    private void checkNetworkAvailability() {
+    private boolean checkNetworkAvailability() {
         if (!NetworkUtilities.isNetworkEnabled(this)) {
             AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setTitle("Connection Unavailable")
-                    .setMessage("Unable to establish internet connection")
+                    .setMessage(R.string.internet_connection_error)
                     .setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
-                            finish();
+                            error.setText(R.string.internet_connection_error);
+                            recyclerViewMovies.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.GONE);
+                            errorView.setVisibility(View.VISIBLE);
                         }
                     }).setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                         @Override
@@ -85,7 +96,9 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }).create();
             dialog.show();
+            return false;
         }
+        return true;
     }
 
     @Override
@@ -120,11 +133,18 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    public void onClickReload(View view) {
+        new MovieListTask().execute();
+    }
+
     private class MovieListTask extends AsyncTask<Void, Void, String> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            checkNetworkAvailability();
+            if (!checkNetworkAvailability()) {
+                return;
+            }
+            errorView.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
             recyclerViewMovies.setVisibility(View.GONE);
             if (getSupportActionBar() != null) {
@@ -138,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
             if (response == null) {
-                Toast.makeText(MainActivity.this, "A network error occurred", Toast.LENGTH_SHORT).show();
+                errorView.setVisibility(View.VISIBLE);
                 return;
             }
             List<Movie> movies = new ArrayList<>();
@@ -150,7 +170,8 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject movieObject = jsonArray.getJSONObject(i);
                     Movie movie = new Movie();
                     movie.setPosterUrl(NetworkUtilities.buildImageUrl(movieObject.getString("poster_path")));
-                    movie.setBackdropUrl(NetworkUtilities.buildImageUrl(movieObject.getString("backdrop_path")));
+                    movie.setBackdropUrl(NetworkUtilities.buildImageUrl(movieObject.getString("backdrop_path"),
+                            NetworkUtilities.LARGE_IMAGE_SIZE));
                     movie.setTitle(movieObject.getString("title"));
                     movie.setOverview(movieObject.getString("overview"));
                     movie.setRating(movieObject.getDouble("vote_average"));
@@ -166,7 +187,9 @@ public class MainActivity extends AppCompatActivity {
 
             recyclerViewMovies.setVisibility(View.VISIBLE);
             movieListAdapter.setMovieList(movies);
+            errorView.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
+
         }
 
         @Override
