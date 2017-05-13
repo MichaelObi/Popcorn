@@ -17,7 +17,7 @@ import xyz.michaelobi.popcorn.BuildConfig;
 public class NetworkUtilities {
 
     private final static String PARAM_API_KEY = "?api_key=";
-    private static final String BASE_API_URL =
+    public static final String BASE_API_URL =
             "https://api.themoviedb.org/3/movie/";
     private static final String BASE_IMAGE_URL =
             "http://image.tmdb.org/t/p/";

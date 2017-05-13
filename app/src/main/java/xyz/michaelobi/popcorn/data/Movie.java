@@ -18,6 +18,7 @@ public class Movie implements Parcelable {
     private String backdropUrl;
     private double rating;
     private String releaseYear;
+    private int id;
 
     public String getPosterUrl() {
         return posterUrl;
@@ -105,4 +106,12 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
 }

@@ -8,4 +8,5 @@
     <string name="sort">Sort</string>
     <string name="retry">Retry</string>
     <string name="internet_connection_error">Unable to establish internet connection</string>
+    <string name="trailers">Trailers</string>
 </resources>

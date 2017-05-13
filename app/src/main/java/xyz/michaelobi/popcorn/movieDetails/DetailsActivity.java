@@ -4,23 +4,32 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.util.List;
+
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import xyz.michaelobi.popcorn.R;
 import xyz.michaelobi.popcorn.data.Movie;
+import xyz.michaelobi.popcorn.data.Video;
+import xyz.michaelobi.popcorn.data.remote.Client;
+import xyz.michaelobi.popcorn.data.remote.MovieDbService;
+import xyz.michaelobi.popcorn.utils.NetworkUtilities;
 
-public class DetailsActivity extends AppCompatActivity{
+public class DetailsActivity extends AppCompatActivity {
 
     Movie movie;
     ImageView backdrop, poster;
     CollapsingToolbarLayout collapsingToolbarLayout;
     RatingBar ratingBar;
     TextView title, year, overview;
+    MovieDbService movieDbService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +65,15 @@ public class DetailsActivity extends AppCompatActivity{
                 .load(movie.getPosterUrl())
                 .into(poster);
 
+        loadTrailers(movie.getId());
+    }
+
+    private void loadTrailers(int id) {
+        movieDbService = Client.getApiService();
+        try {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

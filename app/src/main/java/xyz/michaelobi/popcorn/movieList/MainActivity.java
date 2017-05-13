@@ -163,19 +163,20 @@ public class MainActivity extends AppCompatActivity {
             }
             List<Movie> movies = new ArrayList<>();
             try {
+                Log.e(TAG, response);
                 JSONObject jsonObject = new JSONObject(response);
                 JSONArray jsonArray = jsonObject.getJSONArray("results");
 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject movieObject = jsonArray.getJSONObject(i);
                     Movie movie = new Movie();
+                    movie.setId(movieObject.getInt("id"));
                     movie.setPosterUrl(NetworkUtilities.buildImageUrl(movieObject.getString("poster_path")));
                     movie.setBackdropUrl(NetworkUtilities.buildImageUrl(movieObject.getString("backdrop_path"),
                             NetworkUtilities.LARGE_IMAGE_SIZE));
                     movie.setTitle(movieObject.getString("title"));
                     movie.setOverview(movieObject.getString("overview"));
                     movie.setRating(movieObject.getDouble("vote_average"));
-
                     String releaseDate = movieObject.getString("release_date");
                     String year = releaseDate.split("-")[0];
                     movie.setReleaseYear(year);
