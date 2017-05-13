@@ -13,14 +13,11 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.util.List;
 
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import xyz.michaelobi.popcorn.R;
 import xyz.michaelobi.popcorn.data.Movie;
 import xyz.michaelobi.popcorn.data.Video;
 import xyz.michaelobi.popcorn.data.remote.Client;
 import xyz.michaelobi.popcorn.data.remote.MovieDbService;
-import xyz.michaelobi.popcorn.utils.NetworkUtilities;
 
 public class DetailsActivity extends AppCompatActivity {
 
@@ -71,6 +68,7 @@ public class DetailsActivity extends AppCompatActivity {
     private void loadTrailers(int id) {
         movieDbService = Client.getApiService();
         try {
+            List<Video> videos = movieDbService.getMovieTrailers(id).execute().body();
         } catch (IOException e) {
             e.printStackTrace();
         }

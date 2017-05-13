@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'me.tatarka.retrolambda'
 def TMDB_API_KEY = '"' + TheMovieDbApiKey + '"' ?: '"Define API key"';
-
 
 android {
     compileSdkVersion 25
@@ -22,6 +21,10 @@ android {
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             }
         }
+        compileOptions {
+            targetCompatibility 1.8
+            sourceCompatibility 1.8
+        }
     }
     dataBinding {
         enabled = true
@@ -41,3 +44,4 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
     compile 'com.squareup.okhttp:okhttp:2.7.5'
 }
+
