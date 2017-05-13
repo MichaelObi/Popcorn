@@ -42,6 +42,7 @@
 
     <android.support.v4.widget.NestedScrollView
             xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/scroll_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
@@ -205,6 +206,19 @@
             </LinearLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_favorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_favorite_border"
+            android:layout_gravity="bottom|end"
+            app:layout_anchorGravity="bottom|end"
+            app:elevation="4dp"
+            android:clickable="true"
+            android:onClick="toggleFavorite"
+            android:layout_margin="@dimen/fab_margin"
+            app:pressedTranslationZ="12dp"/>
 
 
 </android.support.design.widget.CoordinatorLayout>

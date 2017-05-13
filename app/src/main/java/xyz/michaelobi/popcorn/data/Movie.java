@@ -3,13 +3,17 @@ package xyz.michaelobi.popcorn.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import io.realm.RealmModel;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.RealmClass;
+
 /**
  * Popcorn
  * Michael Obi
  * 11 04 2017 12:44 AM
  */
-
-public class Movie implements Parcelable {
+@RealmClass
+public class Movie implements Parcelable, RealmModel {
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
         @Override
         public Movie createFromParcel(Parcel source) {
@@ -27,7 +31,10 @@ public class Movie implements Parcelable {
     private String backdropUrl;
     private double rating;
     private String releaseYear;
+
+    @PrimaryKey
     private int id;
+    private boolean favorite;
 
     public Movie() {
     }
@@ -112,5 +119,13 @@ public class Movie implements Parcelable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 }

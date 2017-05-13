@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -21,10 +23,11 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmObject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.http.HTTP;
 import xyz.michaelobi.popcorn.R;
 import xyz.michaelobi.popcorn.data.Movie;
 import xyz.michaelobi.popcorn.data.Video;
@@ -44,10 +47,13 @@ public class DetailsActivity extends AppCompatActivity {
     MovieDbService movieDbService;
     List<Video> trailers = new ArrayList<>();
     LinearLayout trailersLayout;
+    FloatingActionButton fabFavorite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Realm.init(this);
+
         setContentView(R.layout.details);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -61,6 +67,7 @@ public class DetailsActivity extends AppCompatActivity {
             finish();
         }
         backdrop = (ImageView) findViewById(R.id.backdrop);
+        fabFavorite = (FloatingActionButton) findViewById(R.id.fab_favorite);
         trailersLayout = (LinearLayout) findViewById(R.id.trailers_layout);
         ratingBar = (RatingBar) findViewById(R.id.rating);
         poster = (ImageView) findViewById(R.id.poster);
@@ -73,6 +80,7 @@ public class DetailsActivity extends AppCompatActivity {
         ratingBar.setRating((float) (movie.getRating() / 2));
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         collapsingToolbarLayout.setTitle("");
+        updateFavoriteFab();
         Picasso.with(this)
                 .load(movie.getBackdropUrl())
                 .into(backdrop);
@@ -81,6 +89,35 @@ public class DetailsActivity extends AppCompatActivity {
                 .into(poster);
 
         loadTrailers(movie.getId());
+    }
+
+
+    public void toggleFavorite(View view) {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            Movie m = realm.where(Movie.class).equalTo("id", movie.getId()).findFirst();
+            if (m == null) {
+                //Movie isn't favorite
+                realm.beginTransaction();
+                realm.copyToRealm(movie);
+                realm.commitTransaction();
+                updateFavoriteFab();
+                return;
+            }
+            // All changes to data must happen in a transaction
+            realm.executeTransaction(realm1 -> RealmObject.deleteFromRealm(m));
+            updateFavoriteFab();
+        }
+    }
+
+    private void updateFavoriteFab() {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            Movie m = realm.where(Movie.class).equalTo("id", movie.getId()).findFirst();
+            if (m == null) {
+                fabFavorite.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite_border));
+                return;
+            }
+            fabFavorite.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite));
+        }
     }
 
     private void loadTrailers(int id) {

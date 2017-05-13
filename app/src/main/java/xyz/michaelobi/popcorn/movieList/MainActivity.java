@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -144,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
         errorView.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
     }
+
 
     private void setActionBarSubtitle() {
         if (getSupportActionBar() != null) {
