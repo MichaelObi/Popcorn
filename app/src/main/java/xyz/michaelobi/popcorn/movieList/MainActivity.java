@@ -1,6 +1,5 @@
 package xyz.michaelobi.popcorn.movieList;
 
-import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import xyz.michaelobi.popcorn.R;
 import xyz.michaelobi.popcorn.data.Movie;
@@ -48,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     View errorView;
     TextView error;
     Button retryButton;
+    ArrayList<Movie> movies = new ArrayList<>();
     private ProgressBar progressBar;
     private RecyclerView recyclerViewMovies;
     private MovieListAdapter movieListAdapter;
@@ -59,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         MainBinding binding = DataBindingUtil.setContentView(this, R.layout.main);
         errorView = binding.errorLayout;
         error = binding.error;
-
         retryButton = binding.btnRetry;
         progressBar = binding.progressbarLoading;
         recyclerViewMovies = binding.rvMovies;
@@ -68,7 +66,21 @@ public class MainActivity extends AppCompatActivity {
         movieListAdapter = new MovieListAdapter(this);
         recyclerViewMovies.setAdapter(movieListAdapter);
 
-        new MovieListTask().execute();
+        if (savedInstanceState == null) {
+            new MovieListTask().execute();
+        } else {
+            sortBy = savedInstanceState.getString("sortBy");
+            movies = savedInstanceState.getParcelableArrayList("movies");
+            setActionBarSubtitle();
+            displayMovies();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("movies", movies);
+        outState.putString("sortBy", sortBy);
     }
 
     private int calculateNoOfColumns() {
@@ -81,20 +93,12 @@ public class MainActivity extends AppCompatActivity {
         if (!NetworkUtilities.isNetworkEnabled(this)) {
             AlertDialog dialog = new AlertDialog.Builder(this)
                     .setMessage(R.string.internet_connection_error)
-                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            error.setText(R.string.internet_connection_error);
-                            recyclerViewMovies.setVisibility(View.GONE);
-                            progressBar.setVisibility(View.GONE);
-                            errorView.setVisibility(View.VISIBLE);
-                        }
-                    }).setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    }).create();
+                    .setOnDismissListener(dialog1 -> {
+                        error.setText(R.string.internet_connection_error);
+                        recyclerViewMovies.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.GONE);
+                        errorView.setVisibility(View.VISIBLE);
+                    }).setPositiveButton("Okay", (dialog12, which) -> dialog12.dismiss()).create();
             dialog.show();
             return false;
         }
@@ -106,17 +110,14 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu_main, menu);
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setSingleChoiceItems(R.array.sort_type, 0, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0) {
-                            sortBy = sortTypePopular;
-                        } else {
-                            sortBy = sortTypeTopRated;
-                        }
-                        dialog.dismiss();
-                        new MovieListTask().execute();
+                .setSingleChoiceItems(R.array.sort_type, 0, (dialog, which) -> {
+                    if (which == 0) {
+                        sortBy = sortTypePopular;
+                    } else {
+                        sortBy = sortTypeTopRated;
                     }
+                    dialog.dismiss();
+                    new MovieListTask().execute();
                 });
         alertDialog = builder.create();
         return true;
@@ -137,6 +138,21 @@ public class MainActivity extends AppCompatActivity {
         new MovieListTask().execute();
     }
 
+    private void displayMovies() {
+        recyclerViewMovies.setVisibility(View.VISIBLE);
+        movieListAdapter.setMovieList(movies);
+        errorView.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
+    }
+
+    private void setActionBarSubtitle() {
+        if (getSupportActionBar() != null) {
+            String s = sortBy.replace("_", " ");
+            String sortedBy = s.substring(0, 1).toUpperCase() + s.substring(1); // Capitalize sorttype
+            getSupportActionBar().setSubtitle(String.format("%s movies", sortedBy));
+        }
+    }
+
     private class MovieListTask extends AsyncTask<Void, Void, String> {
         @Override
         protected void onPreExecute() {
@@ -147,11 +163,7 @@ public class MainActivity extends AppCompatActivity {
             errorView.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
             recyclerViewMovies.setVisibility(View.GONE);
-            if (getSupportActionBar() != null) {
-                String s = sortBy.replace("_", " ");
-                String sortedBy = s.substring(0, 1).toUpperCase() + s.substring(1); // Capitalize sorttype
-                getSupportActionBar().setSubtitle(String.format("%s movies", sortedBy));
-            }
+            setActionBarSubtitle();
         }
 
         @Override
@@ -161,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
                 errorView.setVisibility(View.VISIBLE);
                 return;
             }
-            List<Movie> movies = new ArrayList<>();
             try {
                 Log.e(TAG, response);
                 JSONObject jsonObject = new JSONObject(response);
@@ -185,12 +196,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage(), e);
             }
-
-            recyclerViewMovies.setVisibility(View.VISIBLE);
-            movieListAdapter.setMovieList(movies);
-            errorView.setVisibility(View.GONE);
-            progressBar.setVisibility(View.GONE);
-
+            displayMovies();
         }
 
         @Override

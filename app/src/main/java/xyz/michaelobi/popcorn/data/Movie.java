@@ -3,8 +3,6 @@ package xyz.michaelobi.popcorn.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
-
 /**
  * Popcorn
  * Michael Obi
@@ -12,6 +10,17 @@ import java.io.Serializable;
  */
 
 public class Movie implements Parcelable {
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
     private String posterUrl;
     private String overview;
     private String title;
@@ -19,6 +28,19 @@ public class Movie implements Parcelable {
     private double rating;
     private String releaseYear;
     private int id;
+
+    public Movie() {
+    }
+
+    protected Movie(Parcel in) {
+        this.id = in.readInt();
+        this.posterUrl = in.readString();
+        this.overview = in.readString();
+        this.title = in.readString();
+        this.backdropUrl = in.readString();
+        this.rating = in.readDouble();
+        this.releaseYear = in.readString();
+    }
 
     public String getPosterUrl() {
         return posterUrl;
@@ -44,28 +66,28 @@ public class Movie implements Parcelable {
         this.title = title;
     }
 
-    public void setBackdropUrl(String backdropUrl) {
-        this.backdropUrl = backdropUrl;
-    }
-
     public String getBackdropUrl() {
         return backdropUrl;
     }
 
-    public void setRating(double rating) {
-        this.rating = rating;
+    public void setBackdropUrl(String backdropUrl) {
+        this.backdropUrl = backdropUrl;
     }
 
     public double getRating() {
         return rating;
     }
 
-    public void setReleaseYear(String releaseYear) {
-        this.releaseYear = releaseYear;
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 
     public String getReleaseYear() {
         return releaseYear;
+    }
+
+    public void setReleaseYear(String releaseYear) {
+        this.releaseYear = releaseYear;
     }
 
     @Override
@@ -75,6 +97,7 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
         dest.writeString(this.posterUrl);
         dest.writeString(this.overview);
         dest.writeString(this.title);
@@ -83,35 +106,11 @@ public class Movie implements Parcelable {
         dest.writeString(this.releaseYear);
     }
 
-    public Movie() {
+    public int getId() {
+        return id;
     }
-
-    protected Movie(Parcel in) {
-        this.posterUrl = in.readString();
-        this.overview = in.readString();
-        this.title = in.readString();
-        this.backdropUrl = in.readString();
-        this.rating = in.readDouble();
-        this.releaseYear = in.readString();
-    }
-
-    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
-        @Override
-        public Movie createFromParcel(Parcel source) {
-            return new Movie(source);
-        }
-
-        @Override
-        public Movie[] newArray(int size) {
-            return new Movie[size];
-        }
-    };
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getId() {
-        return id;
     }
 }

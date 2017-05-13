@@ -2,23 +2,21 @@
                                                  xmlns:app="http://schemas.android.com/apk/res-auto"
                                                  xmlns:tools="http://schemas.android.com/tools"
                                                  android:layout_width="match_parent"
-                                                 android:layout_height="match_parent"
-                                                 android:fitsSystemWindows="true">
+                                                 android:fitsSystemWindows="true"
+                                                 android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
             android:id="@+id/app_bar"
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:theme="@style/AppTheme.AppBarOverlay"
-            android:fitsSystemWindows="true">
+            android:fitsSystemWindows="true"
+            app:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/toolbar_layout"
                 app:titleEnabled="false"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fitsSystemWindows="true"
                 app:contentScrim="?attr/colorPrimary"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
@@ -27,8 +25,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
-                    android:fitsSystemWindows="true"
                     android:scaleType="centerCrop"
+                    android:fitsSystemWindows="true"
                     app:layout_collapseMode="parallax"
                     tools:ignore="ContentDescription"/>
 
@@ -107,6 +105,20 @@
                         android:layout_marginBottom="@dimen/text_margin_horizontal"
                         android:layout_marginTop="@dimen/text_margin_horizontal"/>
 
+                <TextView
+                        android:layout_below="@id/rating"
+                        android:layout_gravity="center"
+                        android:id="@+id/review_count"
+                        android:layout_width="wrap_content"
+                        android:layout_toEndOf="@id/poster"
+                        android:textColor="@color/colorAccent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/text_margin"
+                        android:layout_marginRight="@dimen/text_margin"
+                        android:layout_marginBottom="@dimen/text_margin_horizontal"
+                        android:layout_marginTop="@dimen/text_margin_horizontal"
+                        tools:text="578 reviews"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
             </RelativeLayout>
 
             <TextView
@@ -140,6 +152,57 @@
                     android:layout_marginTop="@dimen/text_margin_horizontal"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
 
+            <LinearLayout
+                    android:id="@+id/trailers_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                <TextView
+                        tools:visibility="visible"
+                        android:visibility="gone"
+                        android:layout_gravity="center"
+                        android:id="@+id/no_trailer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/text_margin"
+                        android:layout_marginRight="@dimen/text_margin"
+                        android:layout_marginBottom="@dimen/text_margin_horizontal"
+                        android:layout_marginTop="@dimen/text_margin_horizontal"
+                        android:text="@string/no_trailer_available"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
+            </LinearLayout>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reviews"
+                    android:layout_marginLeft="@dimen/text_margin"
+                    android:layout_marginRight="@dimen/text_margin"
+                    android:layout_marginBottom="@dimen/text_margin_horizontal"
+                    android:layout_marginTop="@dimen/text_margin_horizontal"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
+
+            <LinearLayout
+                    android:id="@+id/reviews_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                <TextView
+                        android:layout_gravity="center"
+                        android:id="@+id/no_reviews"
+                        tools:visibility="visible"
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/text_margin"
+                        android:layout_marginRight="@dimen/text_margin"
+                        android:layout_marginBottom="@dimen/text_margin_horizontal"
+                        android:layout_marginTop="@dimen/text_margin_horizontal"
+                        android:text="@string/no_review_available"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
+            </LinearLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 

@@ -9,4 +9,8 @@
     <string name="retry">Retry</string>
     <string name="internet_connection_error">Unable to establish internet connection</string>
     <string name="trailers">Trailers</string>
+    <string name="trailer_1">Trailer 1</string>
+    <string name="no_trailer_available">No trailers available</string>
+    <string name="no_review_available">No review available</string>
+    <string name="reviews">Reviews</string>
 </resources>
