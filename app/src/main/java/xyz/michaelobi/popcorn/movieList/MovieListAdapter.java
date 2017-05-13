@@ -36,7 +36,8 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         if (movieList == movies) {
             return;
         }
-        movieList = movies;
+        movieList.clear();
+        movieList.addAll(movies);
         this.notifyDataSetChanged();
     }
 

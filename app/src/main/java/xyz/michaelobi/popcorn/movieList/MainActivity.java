@@ -4,7 +4,6 @@ import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -27,6 +26,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import xyz.michaelobi.popcorn.R;
 import xyz.michaelobi.popcorn.data.Movie;
 import xyz.michaelobi.popcorn.databinding.MainBinding;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private final String sortTypePopular = "popular";
     private final String sortTypeTopRated = "top_rated";
+    private final String sortTypeFavorites = "favorite";
     AlertDialog alertDialog;
     View errorView;
     TextView error;
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Realm.init(this);
         MainBinding binding = DataBindingUtil.setContentView(this, R.layout.main);
         errorView = binding.errorLayout;
         error = binding.error;
@@ -114,14 +117,27 @@ public class MainActivity extends AppCompatActivity {
                 .setSingleChoiceItems(R.array.sort_type, 0, (dialog, which) -> {
                     if (which == 0) {
                         sortBy = sortTypePopular;
-                    } else {
+                        new MovieListTask().execute();
+                    } else if (which == 1) {
                         sortBy = sortTypeTopRated;
+                        new MovieListTask().execute();
+                    } else if (which == 2) {
+                        sortBy = sortTypeFavorites;
+                        getFavorites();
                     }
                     dialog.dismiss();
-                    new MovieListTask().execute();
                 });
         alertDialog = builder.create();
         return true;
+    }
+
+    private void getFavorites() {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            RealmResults<Movie> movieResults = realm.where(Movie.class).findAll();
+            movies.clear();
+            movies.addAll(realm.copyFromRealm(movieResults));
+        }
+        displayMovies();
     }
 
     @Override
@@ -144,8 +160,8 @@ public class MainActivity extends AppCompatActivity {
         movieListAdapter.setMovieList(movies);
         errorView.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
+        setActionBarSubtitle();
     }
-
 
     private void setActionBarSubtitle() {
         if (getSupportActionBar() != null) {
@@ -179,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, response);
                 JSONObject jsonObject = new JSONObject(response);
                 JSONArray jsonArray = jsonObject.getJSONArray("results");
-
+                movies.clear();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject movieObject = jsonArray.getJSONObject(i);
                     Movie movie = new Movie();
