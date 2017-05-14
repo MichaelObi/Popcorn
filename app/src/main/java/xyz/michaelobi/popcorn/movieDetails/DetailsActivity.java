@@ -30,6 +30,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import xyz.michaelobi.popcorn.R;
 import xyz.michaelobi.popcorn.data.Movie;
+import xyz.michaelobi.popcorn.data.Review;
 import xyz.michaelobi.popcorn.data.Video;
 import xyz.michaelobi.popcorn.data.remote.ApiResponse;
 import xyz.michaelobi.popcorn.data.remote.Client;
@@ -46,8 +47,9 @@ public class DetailsActivity extends AppCompatActivity {
     TextView title, year, overview;
     MovieDbService movieDbService;
     List<Video> trailers = new ArrayList<>();
-    LinearLayout trailersLayout;
+    LinearLayout trailersLayout, reviewsLayout;
     FloatingActionButton fabFavorite;
+    List<Review> reviews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,7 @@ public class DetailsActivity extends AppCompatActivity {
         backdrop = (ImageView) findViewById(R.id.backdrop);
         fabFavorite = (FloatingActionButton) findViewById(R.id.fab_favorite);
         trailersLayout = (LinearLayout) findViewById(R.id.trailers_layout);
+        reviewsLayout = (LinearLayout) findViewById(R.id.reviews_layout);
         ratingBar = (RatingBar) findViewById(R.id.rating);
         poster = (ImageView) findViewById(R.id.poster);
         title = (TextView) findViewById(R.id.title);
@@ -89,6 +92,24 @@ public class DetailsActivity extends AppCompatActivity {
                 .into(poster);
 
         loadTrailers(movie.getId());
+        loadReviews(movie.getId());
+    }
+
+    private void loadReviews(int id) {
+        movieDbService = Client.getApiService();
+        movieDbService.getMovieReviews(id).enqueue(new Callback<ApiResponse<Review>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Review>> call, Response<ApiResponse<Review>> response) {
+                reviews = response.body().getResults();
+                displayReviews();
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Review>> call, Throwable t) {
+                Log.d(TAG, t.getMessage());
+                Toast.makeText(DetailsActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
@@ -146,6 +167,21 @@ public class DetailsActivity extends AppCompatActivity {
             trailersLayout.addView(v);
             v.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW,
                     Uri.parse(NetworkUtilities.YOUTUBE_URL + video.getKey()))));
+        });
+    }
+
+
+    private void displayReviews() {
+        reviews.forEach(review -> {
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View v = inflater.inflate(R.layout.review_list_item, null);
+            TextView author = (TextView) v.findViewById(R.id.author);
+            TextView reviewText = (TextView) v.findViewById(R.id.review_text);
+            author.setText(review.getAuthor());
+            reviewText.setText(review.getContent());
+            reviewsLayout.addView(v);
+            v.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(review.getUrl()))));
         });
     }
 
