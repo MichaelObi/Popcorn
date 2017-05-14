@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewMovies.setLayoutManager(new GridLayoutManager(this, calculateNoOfColumns()));
         movieListAdapter = new MovieListAdapter(this);
         recyclerViewMovies.setAdapter(movieListAdapter);
-
+        int checkedItemPosition = 0;
         if (savedInstanceState == null) {
             new MovieListTask().execute();
         } else {
@@ -77,7 +77,23 @@ public class MainActivity extends AppCompatActivity {
             movies = savedInstanceState.getParcelableArrayList("movies");
             setActionBarSubtitle();
             displayMovies();
+            checkedItemPosition = savedInstanceState.getInt("sort_checked_item_position");
         }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setSingleChoiceItems(R.array.sort_type, checkedItemPosition, (dialog, which) -> {
+                    if (which == 0) {
+                        sortBy = sortTypePopular;
+                        new MovieListTask().execute();
+                    } else if (which == 1) {
+                        sortBy = sortTypeTopRated;
+                        new MovieListTask().execute();
+                    } else if (which == 2) {
+                        sortBy = sortTypeFavorites;
+                        getFavorites();
+                    }
+                    dialog.dismiss();
+                });
+        alertDialog = builder.create();
     }
 
     @Override
@@ -85,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList("movies", movies);
         outState.putString("sortBy", sortBy);
+        outState.putInt("sort_checked_item_position", alertDialog.getListView().getCheckedItemPosition());
     }
 
     private int calculateNoOfColumns() {
@@ -113,21 +130,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu_main, menu);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setSingleChoiceItems(R.array.sort_type, 0, (dialog, which) -> {
-                    if (which == 0) {
-                        sortBy = sortTypePopular;
-                        new MovieListTask().execute();
-                    } else if (which == 1) {
-                        sortBy = sortTypeTopRated;
-                        new MovieListTask().execute();
-                    } else if (which == 2) {
-                        sortBy = sortTypeFavorites;
-                        getFavorites();
-                    }
-                    dialog.dismiss();
-                });
-        alertDialog = builder.create();
+
         return true;
     }
 
