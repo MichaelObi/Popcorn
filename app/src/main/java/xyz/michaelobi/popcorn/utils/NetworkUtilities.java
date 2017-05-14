@@ -16,15 +16,17 @@ import xyz.michaelobi.popcorn.BuildConfig;
 
 public class NetworkUtilities {
 
-    private final static String PARAM_API_KEY = "?api_key=";
-    private static final String BASE_API_URL =
-            "https://api.themoviedb.org/3/movie/";
-    private static final String BASE_IMAGE_URL =
-            "http://image.tmdb.org/t/p/";
+    public static final String BASE_API_URL =
+            "https://api.themoviedb.org/3/";
+    public static final String BASE_MOVIE_URL = BASE_API_URL + "movie/";
     public static final String DEFAULT_IMAGE_SIZE =
             "w185";
+    public static final String LARGE_IMAGE_SIZE = "w342";
+    private final static String PARAM_API_KEY = "?api_key=";
 
-    public static final String LARGE_IMAGE_SIZE  = "w342";
+    public final static String YOUTUBE_URL = "https://youtube.com/watch?v=";
+    private static final String BASE_IMAGE_URL =
+            "http://image.tmdb.org/t/p/";
 
     public static Boolean isNetworkEnabled(Context c) {
         ConnectivityManager cManager = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -49,7 +51,7 @@ public class NetworkUtilities {
      * @return The URL to use to query the server.
      */
     public static URL buildUrl(String sortBy) {
-        Uri uri = Uri.parse(BASE_API_URL + sortBy + PARAM_API_KEY + BuildConfig.TMDB_API_KEY).buildUpon()
+        Uri uri = Uri.parse(BASE_MOVIE_URL + sortBy + PARAM_API_KEY + BuildConfig.TMDB_API_KEY).buildUpon()
                 .build();
         URL url = null;
         try {
@@ -92,7 +94,7 @@ public class NetworkUtilities {
         return buildImageUrl(fileName, DEFAULT_IMAGE_SIZE);
     }
 
-    public static String  buildImageUrl(String fileName, String size) {
+    public static String buildImageUrl(String fileName, String size) {
         return BASE_IMAGE_URL + size + fileName;
     }
 }

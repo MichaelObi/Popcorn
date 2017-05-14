@@ -36,7 +36,8 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         if (movieList == movies) {
             return;
         }
-        movieList = movies;
+        movieList.clear();
+        movieList.addAll(movies);
         this.notifyDataSetChanged();
     }
 
@@ -52,13 +53,10 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         String imgUrl = movie.getPosterUrl();
         Picasso.with(context).load(imgUrl)
                 .into(holder.poster);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, DetailsActivity.class);
-                intent.putExtra("movie", movie);
-                context.startActivity(intent);
-            }
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, DetailsActivity.class);
+            intent.putExtra("movie", movie);
+            context.startActivity(intent);
         });
     }
 
