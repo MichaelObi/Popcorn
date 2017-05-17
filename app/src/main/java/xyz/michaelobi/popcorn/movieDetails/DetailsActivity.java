@@ -23,8 +23,6 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.Realm;
-import io.realm.RealmObject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,6 +30,8 @@ import xyz.michaelobi.popcorn.R;
 import xyz.michaelobi.popcorn.data.Movie;
 import xyz.michaelobi.popcorn.data.Review;
 import xyz.michaelobi.popcorn.data.Video;
+import xyz.michaelobi.popcorn.data.provider.DbMovieRepository;
+import xyz.michaelobi.popcorn.data.provider.MovieRepository;
 import xyz.michaelobi.popcorn.data.remote.ApiResponse;
 import xyz.michaelobi.popcorn.data.remote.Client;
 import xyz.michaelobi.popcorn.data.remote.MovieDbService;
@@ -51,11 +51,12 @@ public class DetailsActivity extends AppCompatActivity {
     FloatingActionButton fabFavorite;
     List<Review> reviews;
 
+    MovieRepository movieRepository;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Realm.init(this);
-
+        movieRepository = new DbMovieRepository(this);
         setContentView(R.layout.details);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -114,31 +115,24 @@ public class DetailsActivity extends AppCompatActivity {
 
 
     public void toggleFavorite(View view) {
-        try (Realm realm = Realm.getDefaultInstance()) {
-            Movie m = realm.where(Movie.class).equalTo("id", movie.getId()).findFirst();
-            if (m == null) {
-                //Movie isn't favorite
-                realm.beginTransaction();
-                realm.copyToRealm(movie);
-                realm.commitTransaction();
-                updateFavoriteFab();
-                return;
-            }
-            // All changes to data must happen in a transaction
-            realm.executeTransaction(realm1 -> RealmObject.deleteFromRealm(m));
+        Movie m = movieRepository.findByMovieId(movie.getId());
+        if (m == null) {
+            movieRepository.addMovie(movie);
             updateFavoriteFab();
+            return;
         }
+        movieRepository.deleteMovie(movie.getId());
+        updateFavoriteFab();
     }
 
     private void updateFavoriteFab() {
-        try (Realm realm = Realm.getDefaultInstance()) {
-            Movie m = realm.where(Movie.class).equalTo("id", movie.getId()).findFirst();
-            if (m == null) {
-                fabFavorite.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite_border));
-                return;
-            }
-            fabFavorite.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite));
+        Movie m = movieRepository.findByMovieId(movie.getId());
+        if (m == null) {
+            fabFavorite.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite_border));
+            return;
         }
+        fabFavorite.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite));
+
     }
 
     private void loadTrailers(int id) {
