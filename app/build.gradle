@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
-apply plugin: 'realm-android'
 def TMDB_API_KEY = '"' + TheMovieDbApiKey + '"' ?: '"Define API key"';
 
 android {

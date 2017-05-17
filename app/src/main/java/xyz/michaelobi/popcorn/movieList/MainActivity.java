@@ -26,10 +26,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
 import xyz.michaelobi.popcorn.R;
 import xyz.michaelobi.popcorn.data.Movie;
+import xyz.michaelobi.popcorn.data.provider.DbMovieRepository;
+import xyz.michaelobi.popcorn.data.provider.MovieRepository;
 import xyz.michaelobi.popcorn.databinding.MainBinding;
 import xyz.michaelobi.popcorn.utils.NetworkUtilities;
 
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     TextView error;
     Button retryButton;
     ArrayList<Movie> movies = new ArrayList<>();
+    MovieRepository movieRepository;
     private ProgressBar progressBar;
     private RecyclerView recyclerViewMovies;
     private MovieListAdapter movieListAdapter;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Realm.init(this);
+        movieRepository =  new DbMovieRepository(this);
         MainBinding binding = DataBindingUtil.setContentView(this, R.layout.main);
         errorView = binding.errorLayout;
         error = binding.error;
@@ -135,11 +136,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getFavorites() {
-        try (Realm realm = Realm.getDefaultInstance()) {
-            RealmResults<Movie> movieResults = realm.where(Movie.class).findAll();
-            movies.clear();
-            movies.addAll(realm.copyFromRealm(movieResults));
-        }
+        movies.clear();
+        movies.addAll(movieRepository.getAll());
         displayMovies();
     }
 

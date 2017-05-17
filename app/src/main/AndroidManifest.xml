@@ -9,9 +9,9 @@
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:launchMode="singleTop"
             android:theme="@style/AppTheme">
         <activity android:name=".movieList.MainActivity">
             <intent-filter>
@@ -21,9 +21,17 @@
             </intent-filter>
         </activity>
         <activity
-                android:theme="@style/DetailsTheme"
-                android:name=".movieDetails.DetailsActivity">
+                android:name=".movieDetails.DetailsActivity"
+                android:theme="@style/DetailsTheme">
         </activity>
+
+        <provider
+                android:name=".data.provider.MoviesContentProvider"
+                android:authorities="xyz.michaelobi.popcorn"
+                android:multiprocess="true"
+                android:enabled="true"
+                android:exported="false">
+        </provider>
     </application>
 
 </manifest>
